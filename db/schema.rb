@@ -169,19 +169,21 @@ ActiveRecord::Schema.define(:version => 20120412140019) do
 
   add_index "profiles", ["citizen_id"], :name => "index_profiles_on_citizen_id"
 
-  create_table "signatures", :force => true do |t|
-    t.integer  "citizen_id"
-    t.integer  "idea_id"
-    t.string   "idea_title"
-    t.date     "idea_date"
-    t.string   "fullname"
-    t.date     "birth_date"
-    t.string   "occupancy_county"
-    t.boolean  "vow"
-    t.date     "signing_date"
-    t.string   "state"
+  create_table "taggings", :force => true do |t|
+    t.integer  "tag_id"
+    t.integer  "taggable_id"
+    t.string   "taggable_type"
+    t.integer  "tagger_id"
+    t.string   "tagger_type"
+    t.string   "context",       :limit => 128
     t.datetime "created_at"
-    t.datetime "updated_at"
+  end
+
+  add_index "taggings", ["tag_id"], :name => "index_taggings_on_tag_id"
+  add_index "taggings", ["taggable_id", "taggable_type", "context"], :name => "index_taggings_on_taggable_id_and_taggable_type_and_context"
+
+  create_table "tags", :force => true do |t|
+    t.string "name"
   end
 
   create_table "votes", :force => true do |t|

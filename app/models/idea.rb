@@ -10,8 +10,10 @@ class Idea < ActiveRecord::Base
 
   friendly_id :title, use: :slugged
 
-  attr_accessible   :title, :body, :summary, :state, 
-                    :comment_count, :vote_count, :vote_for_count, :vote_against_count, :vote_proportion, :vote_proportion_away_mid
+  acts_as_taggable
+
+  attr_accessible :title, :body, :summary, :state,
+                  :comment_count, :vote_count, :vote_for_count, :vote_against_count, :vote_proportion, :vote_proportion_away_mid
 
   has_many :comments, as: :commentable
   has_many :votes

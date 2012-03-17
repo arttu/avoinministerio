@@ -122,4 +122,15 @@ describe Idea do
       end
     end
   end
+
+  describe "tagging" do
+    it "should be taggable" do
+      idea = Factory :idea
+      idea.tag_list << 'Kansalaisaloite'
+      idea.tag_list << 'Verotus'
+      idea.save
+      idea.tags.size.should == 2
+      idea.tag_list.should == ['Kansalaisaloite', 'Verotus']
+    end
+  end
 end
