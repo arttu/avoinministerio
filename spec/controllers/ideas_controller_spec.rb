@@ -55,16 +55,22 @@ describe IdeasController do
   end
 
   describe "#index" do
+    def create_idea(opts = {})
+      idea = FactoryGirl.create :idea
+
+      # comments
+      (opts[:comments] || 0).times { FactoryGirl.create(:comment, commentable: idea) }
+
+      # votes
+      (opts[:votes] || 0).times { FactoryGirl.create(:vote, idea: idea) }
+
+      idea
+    end
+
     before :each do
       @idea = FactoryGirl.create :idea
-
-      @most_voted_idea = FactoryGirl.create :idea
-      FactoryGirl.create(:comment, commentable: @most_voted_idea)
-      2.times { FactoryGirl.create(:vote, idea: @most_voted_idea) }
-
-      @most_commented_idea = FactoryGirl.create :idea
-      2.times { FactoryGirl.create(:comment, commentable: @most_commented_idea) }
-      FactoryGirl.create(:vote, idea: @most_commented_idea)
+      @most_voted_idea = create_idea(comments: 1, votes: 2)
+      @most_commented_idea = create_idea(comments: 2, votes: 1)
     end
 
     it "should list three ideas" do
@@ -78,5 +84,21 @@ describe IdeasController do
 
       assigns(:ideas).map(&:id).should == [@idea.id, @most_voted_idea.id, @most_commented_idea.id]
     end
+
+    it "should order ideas by vote count" do
+      get :index, reorder: "comments"
+
+      assigns(:ideas).map(&:id).should == [@most_commented_idea.id, @most_voted_idea.id, @idea.id]
+    end
+
+    # # I'm really not sure how/what the code is supposed to do when reversing the sorting order
+    # it "should order ideas by vote count" do
+    #   session[:sorting_order] = {comments: [:most, :least]}
+    #
+    #   get :index, reorder: "comments"
+    #
+    #   session[:sorting_order][:comments].should == [:least, :most]
+    #   assigns(:ideas).map(&:id).should == [@idea.id, @most_voted_idea.id, @most_commented_idea.id]
+    # end
   end
 end
