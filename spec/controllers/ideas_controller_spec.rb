@@ -53,4 +53,30 @@ describe IdeasController do
       end
     end
   end
+
+  describe "#index" do
+    before :each do
+      @idea = FactoryGirl.create :idea
+
+      @most_voted_idea = FactoryGirl.create :idea
+      FactoryGirl.create(:comment, commentable: @most_voted_idea)
+      2.times { FactoryGirl.create(:vote, idea: @most_voted_idea) }
+
+      @most_commented_idea = FactoryGirl.create :idea
+      2.times { FactoryGirl.create(:comment, commentable: @most_commented_idea) }
+      FactoryGirl.create(:vote, idea: @most_commented_idea)
+    end
+
+    it "should list three ideas" do
+      get :index
+
+      assigns(:ideas).map(&:id).should == [@most_commented_idea.id, @most_voted_idea.id, @idea.id]
+    end
+
+    it "should reverse the sorting order" do
+      get :index, reorder: "age"
+
+      assigns(:ideas).map(&:id).should == [@idea.id, @most_voted_idea.id, @most_commented_idea.id]
+    end
+  end
 end
